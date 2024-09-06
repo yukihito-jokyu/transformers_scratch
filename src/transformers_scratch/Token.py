@@ -41,14 +41,14 @@ class Token:
 
         # 単語の辞書の読み込み
         try:
-            with open(self.path, "r") as file:
+            with open(self.path, "r", encoding="utf-8") as file:
                 vocab_data = json.load(file)
             self.token2id: dict[str, str] = vocab_data.get("token2id", {})
             self.id2token: dict[str, str] = vocab_data.get("id2token", {})
         except FileNotFoundError:
             print(f"Warning: The file '{self.path}' was not found.")
-            with open(path, "w") as file:
-                json.dump({}, file)
+            with open(path, "w", encoding="utf-8") as file:
+                json.dump({}, file, ensure_ascii=False, indent=4)
 
     def make_vocab(self, path: str) -> None:
         """
@@ -70,7 +70,7 @@ class Token:
             print(f"Warning: The file '{path}' was not found.")
             return
 
-        word_list = text.split(" ")
+        word_list = text.split()
 
         # 単語辞書の作成
         for word in word_list:
@@ -78,3 +78,15 @@ class Token:
                 idx = str(len(self.token2id))
                 self.token2id[word] = idx
                 self.id2token[idx] = word
+
+    def save(self) -> None:
+        """
+        説明
+        ----------
+        単語辞書をjsonに保存する方法
+        """
+
+        # 保存
+        save_data = {"token2id": self.token2id, "id2token": self.id2token}
+        with open(self.path, "w", encoding="utf-8") as file:
+            json.dump(save_data, file, ensure_ascii=False, indent=4)
