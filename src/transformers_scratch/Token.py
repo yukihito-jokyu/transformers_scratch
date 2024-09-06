@@ -101,7 +101,7 @@ class Token:
         with open(self.path, "w", encoding="utf-8") as file:
             json.dump(save_data, file, ensure_ascii=False, indent=4)
 
-    def to_id(self, words: List[str]) -> List[str]:
+    def to_id(self, words: List[str]) -> List[int]:
         """
         説明
         ----------
@@ -114,11 +114,11 @@ class Token:
 
         Returns
         ----------
-        List[str]
+        List[int]
             単語IDのリスト
         """
 
-        return [self.token2id.get(word, "<UNK>") for word in words]
+        return [int(self.token2id.get(word, 3)) for word in words]
 
     def to_token(self, ids: List[str]) -> List[str]:
         """
