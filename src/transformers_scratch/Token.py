@@ -72,7 +72,7 @@ class Token:
             return
 
         # 辞書が空の時、特殊トークンを入れる
-        special_tokens = ["BOS", "EOS", "PAD", "UNK"]
+        special_tokens = ["PAD", "BOS", "EOS", "UNK"]
         if len(self.token2id) == 0:
             for token in special_tokens:
                 if token not in self.token2id:
