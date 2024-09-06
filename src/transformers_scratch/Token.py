@@ -71,6 +71,15 @@ class Token:
             print(f"Warning: The file '{path}' was not found.")
             return
 
+        # 辞書が空の時、特殊トークンを入れる
+        special_tokens = ["BOS", "EOS", "PAD", "UNK"]
+        if len(self.token2id) == 0:
+            for token in special_tokens:
+                if token not in self.token2id:
+                    idx = str(len(self.token2id))
+                    self.token2id[token] = idx
+                    self.id2token[idx] = token
+
         word_list = text.split()
 
         # 単語辞書の作成
