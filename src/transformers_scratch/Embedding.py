@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 
-class Embedding:
+class Embedding(nn.Module):
     """
     Attributes
     ----------
