@@ -4,7 +4,7 @@ from typing import Dict, List
 
 class Token:
     """
-        Attributes
+    Attributes
     ----------
     self.path : str
         単語の辞書を保存するjsonファイルのpath
