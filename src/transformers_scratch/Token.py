@@ -1,4 +1,5 @@
 import json
+from typing import Dict, List
 
 
 class Token:
@@ -7,9 +8,9 @@ class Token:
     ----------
     self.path : str
         単語の辞書を保存するjsonファイルのpath
-    self.token2id : dict[str, int]
+    self.token2id : Dict[str, int]
         単語とそれに対する単語IDが保存されている。
-    self.id2token : dict[int, str]
+    self.id2token : Dict[int, str]
         単語IDとそれに対する単語が保存されている。
 
     method
@@ -43,8 +44,8 @@ class Token:
         try:
             with open(self.path, "r", encoding="utf-8") as file:
                 vocab_data = json.load(file)
-            self.token2id: dict[str, str] = vocab_data.get("token2id", {})
-            self.id2token: dict[str, str] = vocab_data.get("id2token", {})
+            self.token2id: Dict[str, str] = vocab_data.get("token2id", {})
+            self.id2token: Dict[str, str] = vocab_data.get("id2token", {})
         except FileNotFoundError:
             print(f"Warning: The file '{self.path}' was not found.")
             with open(path, "w", encoding="utf-8") as file:
@@ -90,3 +91,41 @@ class Token:
         save_data = {"token2id": self.token2id, "id2token": self.id2token}
         with open(self.path, "w", encoding="utf-8") as file:
             json.dump(save_data, file, ensure_ascii=False, indent=4)
+
+    def to_id(self, words: List[str]) -> List[str]:
+        """
+        説明
+        ----------
+        単語から単語IDに変換するメソッド。
+
+        Parameters
+        ----------
+        words : List[str]
+            単語のリスト
+
+        Returns
+        ----------
+        List[str]
+            単語IDのリスト
+        """
+
+        return [self.token2id.get(word, "<UNK>") for word in words]
+
+    def to_token(self, ids: List[str]) -> List[str]:
+        """
+        説明
+        ----------
+        単語IDから単語に変換するメソッド。
+
+        Parameters
+        ----------
+        ids : List[str]
+            単語IDのリスト
+
+        Returns
+        ----------
+        List[str]
+            単語のリスト
+        """
+
+        return [self.id2token.get(idx, "<UNK>") for idx in ids]
