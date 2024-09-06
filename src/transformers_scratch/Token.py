@@ -43,12 +43,12 @@ class Token:
         try:
             with open(self.path, "r") as file:
                 vocab_data = json.load(file)
-            self.token2id = vocab_data.get("token2id", {})
-            self.id2token = vocab_data.get("id2token", {})
+            self.token2id: dict[str, str] = vocab_data.get("token2id", {})
+            self.id2token: dict[str, str] = vocab_data.get("id2token", {})
         except FileNotFoundError:
             print(f"Warning: The file '{self.path}' was not found.")
-            self.token2id = {}
-            self.id2token = {}
+            with open(path, "w") as file:
+                json.dump({}, file)
 
     def make_vocab(self, path: str) -> None:
         """
