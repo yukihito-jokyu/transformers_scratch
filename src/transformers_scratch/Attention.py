@@ -72,17 +72,21 @@ class MultiHeadAttention(nn.Module):
         次元数
     self.head : int
         head数
+    self.d_k : int
+        head分割時の次元数
     self.W_q : torch.Tensor
         重み
     self.W_k : torch.Tensor
         重み
     self.W_v : torch.Tensor
         重み
+    self.scaled_dot_product_attention : ScaledDotProductAttention
+        Attentionを計算する機構
 
     method
     ----------
-    forward(Xs: torch.Tensor) -> torch.Tensor
-
+    forward(q: torch.Tensor, k: torch.Tensor, v: torch.Tensor) -> torch.Tensor
+        クエリ―、キー、バリューからAttentionの計算を行う
     """
 
     def __init__(self, d_model: int, head: int) -> None:
