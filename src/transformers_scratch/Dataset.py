@@ -1,12 +1,12 @@
 from typing import List, Tuple
 
 import torch
-import torch.nn as nn
+from torch.utils.data import Dataset
 
 from .Token import Token
 
 
-class Dataset(nn.Module):
+class CostumDataset(Dataset):
     """
     Attributes
     ----------
@@ -68,6 +68,6 @@ class Dataset(nn.Module):
         return len(self.src_list)
 
     def __getitem__(self, idx) -> Tuple[torch.Tensor, torch.Tensor]:
-        src_data = torch.Tensor(self.src_vocab.to_id(self.src_list[idx]))
-        tgt_data = torch.Tensor(self.tgt_vocab.to_id(self.tgt_list[idx]))
+        src_data = torch.Tensor(self.src_vocab.to_id(self.src_list[idx])).long()
+        tgt_data = torch.Tensor(self.tgt_vocab.to_id(self.tgt_list[idx])).long()
         return src_data, tgt_data
