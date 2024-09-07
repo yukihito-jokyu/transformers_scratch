@@ -31,6 +31,8 @@ class Embedding(nn.Module):
             パディング用idx
         """
 
+        super(Embedding, self).__init__()
+
         self.embedding_layer = nn.Embedding(
             num_embeddings=vocab_size, embedding_dim=d_model, padding_idx=padding_idx
         )
