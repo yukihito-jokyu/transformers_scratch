@@ -52,7 +52,9 @@ class PositionalEncoding(nn.Module):
             PE値を足した後の値
         """
 
-        return X + self.PE_vector.unsqueeze(0)
+        seq_len = X.size(1)
+
+        return X + self.PE_vector[:seq_len, :].unsqueeze(0)
 
     def _init_PE_vector(self) -> torch.Tensor:
         """
