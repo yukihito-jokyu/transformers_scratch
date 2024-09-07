@@ -56,6 +56,7 @@ networkx==3.2.1
     # via torch
 numpy==1.26.3
     # via torchvision
+    # via transformers-scratch
 packaging==22.0
     # via ipykernel
 parso==0.8.4

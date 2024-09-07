@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 
-class Embedding:
+class Embedding(nn.Module):
     """
     Attributes
     ----------
@@ -30,6 +30,8 @@ class Embedding:
         padding_idx : int
             パディング用idx
         """
+
+        super(Embedding, self).__init__()
 
         self.embedding_layer = nn.Embedding(
             num_embeddings=vocab_size, embedding_dim=d_model, padding_idx=padding_idx
