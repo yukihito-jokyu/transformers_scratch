@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 
+from .Decoder import Decoder
 from .Encoder import Encoder
 
 
@@ -48,9 +49,16 @@ class Transformer(nn.Module):
         """
         super(Transformer, self).__init__()
 
+        # レイヤの定義
         self.encoder = Encoder(
             vocab_size=src_vocab_size, max_len=max_len, d_model=d_model, head=head, N=N
         )
+        self.decoder = Decoder(
+            vocab_size=tgt_vocab_size, max_len=max_len, d_model=d_model, head=head, N=N
+        )
+
+        # 最終層
+        self.linear = nn.Linear(in_features=d_model, out_features=tgt_vocab_size)
 
     def forward(self, src: torch.Tensor, tgt: torch.Tensor) -> torch.Tensor:
         # mask処理
@@ -63,8 +71,13 @@ class Transformer(nn.Module):
 
         # output
         src_output = self.encoder.forward(src=src, mask=src_mask)
+        tgt_output = self.decoder.forward(
+            src=src_output, tgt=tgt, src_tgt_mask=src_mask, tgt_mask=tgt_mask
+        )
 
-        return src_output
+        output = self.linear(tgt_output)
+
+        return output
 
     def _padding_mask(self, X: torch.Tensor) -> torch.Tensor:
         """
