@@ -8,6 +8,8 @@ class Token:
     ----------
     self.path : str
         単語の辞書を保存するjsonファイルのpath
+    self.max_seq : int
+        最大トークン数
     self.token2id : Dict[str, int]
         単語とそれに対する単語IDが保存されている。
     self.id2token : Dict[int, str]
@@ -26,7 +28,7 @@ class Token:
         単語IDから単語に変換する関数。
     """
 
-    def __init__(self, path: str) -> None:
+    def __init__(self, path: str, max_seq: int) -> None:
         """
         説明
         ----------
@@ -36,9 +38,12 @@ class Token:
         ----------
         path : str
             vocabを保存するディレクトリ
+        max_seq : int
+            最大トークン数
         """
 
         self.path = path
+        self.max_seq = max_seq
 
         # 単語の辞書の読み込み
         try:
@@ -117,6 +122,12 @@ class Token:
         List[int]
             単語IDのリスト
         """
+
+        # 初めと終わりにBOS,EOSを追加
+        words = ["BOS"] + words + ["EOS"]
+
+        # パディングを追加する
+        words += ["PAD"] * (self.max_seq - len(words))
 
         return [int(self.token2id.get(word, 3)) for word in words]
 
