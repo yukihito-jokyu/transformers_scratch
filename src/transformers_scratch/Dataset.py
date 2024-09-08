@@ -29,6 +29,7 @@ class CostumDataset(Dataset):
         tgt_vocab_path: str,
         src_dataset_path: str,
         tgt_dataset_path: str,
+        max_seq: int,
     ) -> None:
         """
         説明
@@ -45,6 +46,8 @@ class CostumDataset(Dataset):
             入力のデータセットが保存されているtxtファイルのpath
         tgt_dataset_path : str
             出力のデータセットが保存されているtxtファイルのpath
+        max_seq : int
+            最大トークン数
         """
 
         self.src_list: List[List[str]] = []
@@ -61,8 +64,8 @@ class CostumDataset(Dataset):
                 self.tgt_list.append(line_list)
 
         # 入力出力の辞書の作成
-        self.src_vocab = Token(src_vocab_path)
-        self.tgt_vocab = Token(tgt_vocab_path)
+        self.src_vocab = Token(src_vocab_path, max_seq=max_seq)
+        self.tgt_vocab = Token(tgt_vocab_path, max_seq=max_seq)
 
     def __len__(self) -> int:
         return len(self.src_list)
