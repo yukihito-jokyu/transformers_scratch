@@ -32,7 +32,11 @@ class ScaledDotProductAttention(nn.Module):
         self.d_k = d_k
 
     def forward(
-        self, Q: torch.Tensor, K: torch.Tensor, V: torch.Tensor
+        self,
+        Q: torch.Tensor,
+        K: torch.Tensor,
+        V: torch.Tensor,
+        mask: torch.Tensor | None = None,
     ) -> torch.Tensor:
         """
         説明
@@ -56,8 +60,15 @@ class ScaledDotProductAttention(nn.Module):
 
         qk = torch.matmul(Q, torch.transpose(K, 1, 2))
         scaler = np.sqrt(self.d_k)
+        attention_weight = qk / scaler
 
-        attention_weight = F.softmax(qk / scaler, dim=2)
+        # softmaxの前のmasking処理
+        if mask is not None:
+            attention_weight = attention_weight.data.masked_fill_(
+                mask, -torch.finfo(torch.float).max
+            )
+
+        attention_weight = F.softmax(attention_weight, dim=2)
 
         result = torch.matmul(attention_weight, V)
 
@@ -123,7 +134,11 @@ class MultiHeadAttention(nn.Module):
         self.scaled_dot_product_attention = ScaledDotProductAttention(d_k=self.d_k)
 
     def forward(
-        self, q: torch.Tensor, k: torch.Tensor, v: torch.Tensor
+        self,
+        q: torch.Tensor,
+        k: torch.Tensor,
+        v: torch.Tensor,
+        mask: torch.Tensor | None = None,
     ) -> torch.Tensor:
         """
         説明
@@ -163,8 +178,12 @@ class MultiHeadAttention(nn.Module):
         k = k.reshape(self.head * batch_size, seq_len, self.d_k)
         v = v.reshape(self.head * batch_size, seq_len, self.d_k)
 
+        # maskについてhead分だけ複製する。
+        if mask is not None:
+            mask = mask.repeat(self.head, 1, 1)
+
         # Attention後の値を取得 [batch_size * head, seq_len, d_k]
-        attention_output = self.scaled_dot_product_attention.forward(q, k, v)
+        attention_output = self.scaled_dot_product_attention.forward(q, k, v, mask)
 
         # head分だけ分割する Tuple[[batch_size, seq_len, d_k], ...]
         attention_chunk = torch.chunk(attention_output, self.head, dim=0)

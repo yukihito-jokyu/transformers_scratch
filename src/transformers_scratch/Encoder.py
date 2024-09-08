@@ -51,7 +51,9 @@ class EncoderLayer(nn.Module):
         self.feed_forward_network_dropout = nn.Dropout(p=0.1)
         self.feed_forward_network_norm = Norm(d_model=d_model)
 
-    def forward(self, X: torch.Tensor) -> torch.Tensor:
+    def forward(
+        self, X: torch.Tensor, mask: torch.Tensor | None = None
+    ) -> torch.Tensor:
         """
         説明
         ----------
@@ -69,7 +71,7 @@ class EncoderLayer(nn.Module):
         """
 
         # レイヤの計算
-        X_attention = self.multi_head_attention.forward(q=X, k=X, v=X)
+        X_attention = self.multi_head_attention.forward(q=X, k=X, v=X, mask=mask)
         X_attention_dropout = self.attention_dropout(X_attention)
         X_attention_norm = self.attention_norm.forward(X_attention_dropout + X)
         X_ffn = self.feed_forward_network.forward(X_attention_norm)
@@ -129,7 +131,9 @@ class Encoder(nn.Module):
             [EncoderLayer(d_model=d_model, head=head) for _ in range(N)]
         )
 
-    def forward(self, src: torch.Tensor) -> torch.Tensor:
+    def forward(
+        self, src: torch.Tensor, mask: torch.Tensor | None = None
+    ) -> torch.Tensor:
         """
         説明
         ----------
@@ -151,6 +155,6 @@ class Encoder(nn.Module):
 
         # encoding
         for encoder in self.encoder_laysers:
-            x = encoder.forward(x)
+            x = encoder.forward(x, mask)
 
         return x
