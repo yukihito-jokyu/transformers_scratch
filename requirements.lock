@@ -14,6 +14,7 @@ asttokens==2.4.1
     # via stack-data
 colorama==0.4.6
     # via ipython
+    # via tqdm
 comm==0.2.2
     # via ipykernel
 debugpy==1.8.5
@@ -100,6 +101,8 @@ torchvision==0.19.1+cu121
 tornado==6.4.1
     # via ipykernel
     # via jupyter-client
+tqdm==4.64.1
+    # via transformers-scratch
 traitlets==5.14.3
     # via comm
     # via ipykernel

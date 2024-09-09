@@ -30,10 +30,12 @@ class PositionalEncoding(nn.Module):
             単語ベクトルの次元数
         """
 
+        super(PositionalEncoding, self).__init__()
+
         self.max_len = max_len
         self.d_model = d_model
 
-        self.PE_vector = self._init_PE_vector()
+        self.register_buffer("PE_vector", self._init_PE_vector())
 
     def forward(self, X: torch.Tensor) -> torch.Tensor:
         """
