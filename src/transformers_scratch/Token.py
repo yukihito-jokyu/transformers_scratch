@@ -106,7 +106,7 @@ class Token:
         with open(self.path, "w", encoding="utf-8") as file:
             json.dump(save_data, file, ensure_ascii=False, indent=4)
 
-    def to_id(self, words: List[str]) -> List[int]:
+    def to_id(self, words: List[str], bos: bool = True, eos: bool = True) -> List[int]:
         """
         説明
         ----------
@@ -124,7 +124,10 @@ class Token:
         """
 
         # 初めと終わりにBOS,EOSを追加
-        words = ["BOS"] + words + ["EOS"]
+        if bos:
+            words = ["BOS"] + words
+        if eos:
+            words = words + ["EOS"]
 
         # パディングを追加する
         if self.max_seq > len(words):
