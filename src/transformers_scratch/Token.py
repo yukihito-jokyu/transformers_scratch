@@ -127,7 +127,10 @@ class Token:
         words = ["BOS"] + words + ["EOS"]
 
         # パディングを追加する
-        words += ["PAD"] * (self.max_seq - len(words))
+        if self.max_seq > len(words):
+            words += ["PAD"] * (self.max_seq - len(words))
+        if self.max_seq < len(words):
+            words = words[: self.max_seq]
 
         return [int(self.token2id.get(word, 3)) for word in words]
 

@@ -29,6 +29,8 @@ class ScaledDotProductAttention(nn.Module):
             次元数
         """
 
+        super(ScaledDotProductAttention, self).__init__()
+
         self.d_k = d_k
 
     def forward(
