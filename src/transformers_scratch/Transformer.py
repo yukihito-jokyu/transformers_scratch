@@ -26,6 +26,7 @@ class Transformer(nn.Module):
         d_model: int,
         head: int,
         N: int,
+        device: torch.device,
     ) -> None:
         """
         説明
@@ -48,6 +49,8 @@ class Transformer(nn.Module):
             encoderの処理の回数
         """
         super(Transformer, self).__init__()
+
+        self.device = device
 
         # レイヤの定義
         self.encoder = Encoder(
@@ -107,7 +110,7 @@ class Transformer(nn.Module):
         # seq_lenだけ複製する [batch, 1, seq_len] -> [batch, seq_len, seq_len]
         mask = mask.repeat(1, seq_len, 1)
 
-        return mask
+        return mask.to(self.device)
 
     def _decoder_mask(self, X: torch.Tensor) -> torch.Tensor:
         """
@@ -138,4 +141,4 @@ class Transformer(nn.Module):
         # 0の要素はTrue,それ以外はFalseにする
         mask = mask.eq(0)
 
-        return mask
+        return mask.to(self.device)

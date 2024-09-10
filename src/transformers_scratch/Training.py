@@ -3,6 +3,7 @@ from typing import List, Tuple
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 
 class Training(nn.Module):
@@ -18,7 +19,7 @@ class Training(nn.Module):
         1epoch分の学習を行う
     """
 
-    def __init__(self, net: nn.Module, optimizer) -> None:
+    def __init__(self, net: nn.Module, optimizer, device: torch.device) -> None:
         """
         説明
         ----------
@@ -32,9 +33,10 @@ class Training(nn.Module):
 
         super(Training, self).__init__()
 
-        self.net = net
+        self.net = net.to(device)
         self.criterion = nn.CrossEntropyLoss()
         self.optimizer = optimizer
+        self.device = device
 
     def train_step(
         self, src: torch.Tensor, tgt: torch.Tensor
@@ -54,6 +56,9 @@ class Training(nn.Module):
         Tuple[torch.Tensor, float]
             予測されたoutputとloss値
         """
+
+        src = src.to(self.device)
+        tgt = tgt.to(self.device)
 
         # 予測
         output = self.net.forward(src, tgt)
@@ -99,9 +104,12 @@ class Training(nn.Module):
         train_loss_list = []
 
         # 学習
-        for src, tgt in train_loader:
-            _, train_loss = self.train_step(src, tgt)
+        with tqdm(total=len(train_loader)) as pbar:
+            for src, tgt in train_loader:
+                _, train_loss = self.train_step(src, tgt)
 
-            train_loss_list.append(train_loss.item())
+                train_loss_list.append(train_loss.item())
+
+                pbar.update(1)
 
         return train_loss_list
