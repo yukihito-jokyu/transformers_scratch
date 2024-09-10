@@ -71,6 +71,8 @@ class CostumDataset(Dataset):
         return len(self.src_list)
 
     def __getitem__(self, idx) -> Tuple[torch.Tensor, torch.Tensor]:
-        src_data = torch.Tensor(self.src_vocab.to_id(self.src_list[idx])).long()
+        src_data = torch.Tensor(
+            self.src_vocab.to_id(self.src_list[idx], bos=False, eos=False)
+        ).long()
         tgt_data = torch.Tensor(self.tgt_vocab.to_id(self.tgt_list[idx])).long()
         return src_data, tgt_data

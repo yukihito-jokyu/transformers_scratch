@@ -176,9 +176,12 @@ class MultiHeadAttention(nn.Module):
         v = v.transpose(1, 2)
 
         # 各ヘッドに対して独立したAttentinoをするため、バッチとして定義する [batch_size, head, seq_len, d_k] -> [batch_size * head, seq_len, d_k]
-        q = q.reshape(self.head * batch_size, seq_len, self.d_k)
-        k = k.reshape(self.head * batch_size, seq_len, self.d_k)
-        v = v.reshape(self.head * batch_size, seq_len, self.d_k)
+        # q = q.reshape(self.head * batch_size, seq_len, self.d_k)
+        # k = k.reshape(self.head * batch_size, seq_len, self.d_k)
+        # v = v.reshape(self.head * batch_size, seq_len, self.d_k)
+        q = q.contiguous().view(self.head * batch_size, seq_len, self.d_k)
+        k = k.contiguous().view(self.head * batch_size, seq_len, self.d_k)
+        v = v.contiguous().view(self.head * batch_size, seq_len, self.d_k)
 
         # maskについてhead分だけ複製する。
         if mask is not None:
