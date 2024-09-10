@@ -5,6 +5,8 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
+from .Bleu import BleuScore
+
 
 class Training(nn.Module):
     """
@@ -19,7 +21,9 @@ class Training(nn.Module):
         1epoch分の学習を行う
     """
 
-    def __init__(self, net: nn.Module, optimizer, device: torch.device) -> None:
+    def __init__(
+        self, net: nn.Module, optimizer, device: torch.device, bleu_score: BleuScore
+    ) -> None:
         """
         説明
         ----------
@@ -37,10 +41,11 @@ class Training(nn.Module):
         self.criterion = nn.CrossEntropyLoss()
         self.optimizer = optimizer
         self.device = device
+        self.bleu_score = bleu_score
 
     def train_step(
         self, src: torch.Tensor, tgt: torch.Tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    ) -> Tuple[torch.Tensor, torch.Tensor, float]:
         """
         説明
         ----------
@@ -69,21 +74,26 @@ class Training(nn.Module):
 
         # lossを計算するためにbatch_sizeとseq_sizeを結合する
         # output:[batch_size, seq_len, vocab_size] -> [batch_size * seq_len, vocab_size]
-        output = output.contiguous().view(-1, output.size(-1))
+        outputs = output.contiguous().view(-1, output.size(-1))
         # tgt:[batch_size, seq_size] -> [, batch_size * seq_size]
-        tgt = tgt.contiguous().view(-1)
+        tgts = tgt.contiguous().view(-1)
 
         # lossの算出
-        loss = self.criterion(output, tgt)
+        loss = self.criterion(outputs, tgts)
+
+        _, output_ids = torch.max(output, dim=-1)
+
+        # scoreの算出
+        score = self.bleu_score.calculation_bleu_score(output=output_ids, tgt=tgt)
 
         # 学習
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
 
-        return output, loss
+        return output, loss, score
 
-    def fit(self, train_loader: DataLoader) -> List[float]:
+    def fit(self, train_loader: DataLoader) -> Tuple[List[float], List[float]]:
         """
         説明
         ----------
@@ -102,14 +112,21 @@ class Training(nn.Module):
         """
 
         train_loss_list = []
+        train_score_list = []
+
+        i = 0
 
         # 学習
         with tqdm(total=len(train_loader)) as pbar:
             for src, tgt in train_loader:
-                _, train_loss = self.train_step(src, tgt)
+                _, train_loss, score = self.train_step(src, tgt)
 
                 train_loss_list.append(train_loss.item())
+                train_score_list.append(score)
 
                 pbar.update(1)
+                i += 1
+                if i == 10:
+                    break
 
-        return train_loss_list
+        return train_loss_list, train_score_list
