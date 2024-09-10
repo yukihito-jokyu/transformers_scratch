@@ -134,7 +134,7 @@ class Token:
 
         return [int(self.token2id.get(word, 3)) for word in words]
 
-    def to_token(self, ids: List[str]) -> List[str]:
+    def to_token(self, ids: List[int]) -> List[str]:
         """
         説明
         ----------
@@ -151,4 +151,4 @@ class Token:
             単語のリスト
         """
 
-        return [self.id2token.get(idx, "<UNK>") for idx in ids]
+        return [self.id2token.get(str(idx), "<UNK>") for idx in ids if idx != 0]

@@ -2,9 +2,10 @@ import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
+from src.transformers_scratch.Bleu import BleuScore
 from src.transformers_scratch.Dataset import CostumDataset
+from src.transformers_scratch.Training import Training
 from src.transformers_scratch.Transformer import Transformer
-from transformers_scratch.Training import Training
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
@@ -40,9 +41,11 @@ net = Transformer(
     device=device,
 )
 
+bleu_score = BleuScore(tgt_vocab_path=tgt_vocab_path, max_seq=max_len)
+
 optimizer = optim.Adam(net.parameters(), lr=0.001)
 
-train = Training(net=net, optimizer=optimizer, device=device)
+train = Training(net=net, optimizer=optimizer, device=device, bleu_score=bleu_score)
 
 loss_list = train.fit(train_loader=data_loader)
 
